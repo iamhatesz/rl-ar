@@ -33,7 +33,7 @@ class SumToTargetEnv(gym.Env):
         >>> env.reset()
         np.ndarray([11])
         >>> env.step((10, 3))
-        np.ndarray([1]), 0.0, True, {}
+        np.ndarray([11]), 0.0, True, {}
     """
 
     def __init__(self, env_config: SumToTargetEnvConfig):
