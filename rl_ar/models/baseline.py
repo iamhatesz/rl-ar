@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import gym
 import torch
@@ -38,7 +38,7 @@ class BaselineModel(TorchModelV2, nn.Module):
             nn.Tanh(),
         )
         self.logits_a = nn.Sequential(nn.Linear(self.num_hiddens, self.target))
-        self.logits_b = nn.Sequential(nn.Linear(self.num_hiddens, self.target))
+        self.logits_b = self._init_logits_b()
         self.value = nn.Sequential(
             nn.Linear(self.num_hiddens, 1),
         )
@@ -68,7 +68,9 @@ class BaselineModel(TorchModelV2, nn.Module):
     def forward_action_a(self, features: torch.Tensor) -> torch.Tensor:
         return self.logits_a(features)
 
-    def forward_action_b(self, features: torch.Tensor) -> torch.Tensor:
+    def forward_action_b(
+        self, features: torch.Tensor, action_a: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
         return self.logits_b(features)
 
     def forward_value(self, features: torch.Tensor) -> torch.Tensor:
@@ -78,3 +80,6 @@ class BaselineModel(TorchModelV2, nn.Module):
     def value_function(self) -> TensorType:
         assert self._value is not None
         return torch.reshape(self._value, [-1])
+
+    def _init_logits_b(self) -> nn.Module:
+        return nn.Sequential(nn.Linear(self.num_hiddens, self.target))
